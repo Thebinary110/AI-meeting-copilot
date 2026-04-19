@@ -11,28 +11,23 @@ interface TopBarProps {
 export default function TopBar({ onOpenSettings }: TopBarProps): JSX.Element {
   const exportSession = useSessionStore((s) => s.exportSession);
 
-  const handleExport = (): void => {
-    const session = exportSession();
-    downloadSessionExport(session);
-  };
-
   return (
-    <div className="flex items-center justify-between px-6 py-3 bg-zinc-900 border-b border-zinc-800 flex-shrink-0">
-      <div>
-        <span className="text-white font-semibold text-lg">TwinMind</span>
-        <span className="ml-2 text-zinc-400 text-xs">Live Suggestions</span>
+    <div className="flex items-center justify-between px-5 h-11 bg-[#0c0c0c] border-b border-[#1c1c1c] flex-shrink-0">
+      <div className="flex items-center gap-3">
+        <span className="text-[#e0e0e0] font-medium text-sm tracking-tight">TwinMind</span>
+        <span className="w-px h-3 bg-[#2a2a2a]" />
+        <StatusBadge />
       </div>
-      <StatusBadge />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <button
-          onClick={handleExport}
-          className="px-3 py-1.5 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg border border-zinc-700 transition-colors"
+          onClick={() => downloadSessionExport(exportSession())}
+          className="h-7 px-3 text-xs text-[#888] hover:text-[#ccc] border border-[#222] hover:border-[#333] rounded transition-colors"
         >
           Export
         </button>
         <button
           onClick={onOpenSettings}
-          className="px-3 py-1.5 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg border border-zinc-700 transition-colors"
+          className="h-7 px-3 text-xs text-[#888] hover:text-[#ccc] border border-[#222] hover:border-[#333] rounded transition-colors"
         >
           Settings
         </button>

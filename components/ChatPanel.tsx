@@ -22,9 +22,7 @@ export default function ChatPanel(): JSX.Element {
     if (!trimmed || isLoadingChat) return;
     setInput('');
     void sendMessage(trimmed, 'user_typed');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
@@ -38,21 +36,20 @@ export default function ChatPanel(): JSX.Element {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    const maxH = parseInt(getComputedStyle(el).lineHeight) * 4;
-    el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
+    el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-4 py-3 border-b border-zinc-800 flex-shrink-0">
-        <span className="text-sm font-medium text-zinc-300">Chat</span>
+    <div className="flex flex-col h-full">
+      <div className="px-4 h-10 flex items-center border-b border-[#1c1c1c] flex-shrink-0">
+        <span className="text-xs font-medium text-[#888] uppercase tracking-wider">Chat</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-0">
         {chatHistory.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-zinc-500 text-sm text-center">
-              Click a suggestion or type a question
+            <p className="text-[#444] text-xs text-center leading-relaxed">
+              Click a suggestion or<br />ask a question below
             </p>
           </div>
         ) : (
@@ -61,7 +58,7 @@ export default function ChatPanel(): JSX.Element {
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex-shrink-0 bg-zinc-900 border-t border-zinc-800 p-4">
+      <div className="flex-shrink-0 border-t border-[#1c1c1c] p-3">
         <div className="flex gap-2 items-end">
           <textarea
             ref={textareaRef}
@@ -69,20 +66,29 @@ export default function ChatPanel(): JSX.Element {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             onInput={handleInput}
-            placeholder="Ask a question..."
+            placeholder="Ask a question…"
             rows={1}
-            className="flex-1 bg-zinc-800 rounded-xl px-4 py-3 text-sm resize-none outline-none border border-zinc-700 focus:border-zinc-500 text-zinc-100 placeholder-zinc-500"
+            className="flex-1 bg-[#141414] border border-[#222] focus:border-[#333] rounded-lg px-3 py-2 text-sm text-[#e0e0e0] placeholder-[#3a3a3a] resize-none outline-none transition-colors"
             style={{ maxHeight: '96px' }}
           />
           <button
             onClick={handleSubmit}
             disabled={isLoadingChat || !input.trim()}
-            className="px-4 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium transition-colors flex-shrink-0"
+            className="h-9 px-3 bg-[#1a2234] hover:bg-[#1e2a40] disabled:opacity-30 disabled:cursor-not-allowed text-[#6090c8] rounded-lg text-sm transition-colors flex-shrink-0 border border-[#1e2e48]"
           >
-            Send
+            <SendIcon />
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+function SendIcon(): JSX.Element {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
   );
 }

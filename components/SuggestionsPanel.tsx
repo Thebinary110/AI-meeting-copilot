@@ -6,9 +6,8 @@ import SuggestionCard from './SuggestionCard';
 import { useChatStream } from '../hooks/useChatStream';
 import type { Suggestion } from '../types';
 
-function formatTimestamp(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString();
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function SuggestionsPanel(): JSX.Element {
@@ -26,57 +25,74 @@ export default function SuggestionsPanel(): JSX.Element {
   const reversed = [...suggestionBatches].reverse();
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 flex-shrink-0">
-        <span className="text-sm font-medium text-zinc-300">Live Suggestions</span>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 h-10 border-b border-[#1c1c1c] flex-shrink-0">
+        <span className="text-xs font-medium text-[#888] uppercase tracking-wider">Suggestions</span>
         <button
           onClick={() => void fetchSuggestions('manual')}
           disabled={isLoadingSuggestions}
-          className="w-7 h-7 flex items-center justify-center rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 h-6 px-2.5 rounded text-xs text-[#888] border border-[#222] hover:text-[#ccc] hover:border-[#333] disabled:opacity-30 transition-colors"
           title="Refresh suggestions"
         >
-          <span className={isLoadingSuggestions ? 'animate-spin inline-block' : ''}>↻</span>
+          <RefreshIcon spinning={isLoadingSuggestions} />
+          Refresh
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 min-h-0">
         {reversed.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-zinc-500 text-sm text-center">
-              Suggestions appear here during your conversation
+            <p className="text-[#444] text-xs text-center leading-relaxed">
+              Suggestions appear here<br />while recording
             </p>
           </div>
         ) : (
           reversed.map((batch, i) => {
             const isNewest = i === 0;
             return (
-              <div
-                key={batch.id}
-                className={`space-y-3 ${!isNewest ? 'opacity-70' : ''}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-500">{formatTimestamp(batch.timestamp)}</span>
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-400">
-                    {batch.trigger === 'manual' ? 'manual refresh' : 'auto'}
-                  </span>
+              <div key={batch.id} className={isNewest ? '' : 'opacity-50'}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] tabular-nums text-[#444]">{formatTime(batch.timestamp)}</span>
+                  {batch.trigger === 'manual' && (
+                    <span className="text-[10px] text-[#444]">· manual</span>
+                  )}
                   {isNewest && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-900/50 text-emerald-400 border border-emerald-700/50 font-medium">
-                      NEW
-                    </span>
+                    <span className="text-[10px] text-[#4f8ef7]">· new</span>
                   )}
                 </div>
-                {batch.suggestions.map((s) => (
-                  <SuggestionCard
-                    key={s.id}
-                    suggestion={s}
-                    onSelect={(suggestion) => handleSelect(batch.id, suggestion)}
-                  />
-                ))}
+                <div className="space-y-2">
+                  {batch.suggestions.map((s) => (
+                    <SuggestionCard
+                      key={s.id}
+                      suggestion={s}
+                      onSelect={(suggestion) => handleSelect(batch.id, suggestion)}
+                    />
+                  ))}
+                </div>
               </div>
             );
           })
         )}
       </div>
     </div>
+  );
+}
+
+function RefreshIcon({ spinning }: { spinning: boolean }): JSX.Element {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={spinning ? 'animate-spin' : ''}
+    >
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5" />
+    </svg>
   );
 }
