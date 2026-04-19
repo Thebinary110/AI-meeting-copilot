@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Settings } from '../types';
 import {
+  DEFAULT_GROQ_API_KEY,
   DEFAULT_SUGGESTION_PROMPT,
   DEFAULT_CHAT_PROMPT,
   DEFAULT_SUGGESTION_CONTEXT_WORDS,
@@ -13,6 +14,7 @@ import {
 } from '../lib/prompts';
 
 const defaultSettings: Settings = {
+  groqApiKey: DEFAULT_GROQ_API_KEY,
   suggestionPrompt: DEFAULT_SUGGESTION_PROMPT,
   chatPrompt: DEFAULT_CHAT_PROMPT,
   suggestionContextWords: DEFAULT_SUGGESTION_CONTEXT_WORDS,

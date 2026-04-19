@@ -56,6 +56,7 @@ export function useChatStream(): UseChatStreamReturn {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            apiKey: settings.groqApiKey,
             messages,
             fullTranscript,
             prompt: settings.chatPrompt,

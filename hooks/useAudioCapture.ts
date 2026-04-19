@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useSessionStore } from '../store/session';
+import { useSettingsStore } from '../store/settings';
 
 interface UseAudioCaptureReturn {
   isRecording: boolean;
@@ -20,6 +21,7 @@ export function useAudioCapture(): UseAudioCaptureReturn {
 
   const { appendTranscriptChunk, setRecording, setError } = useSessionStore();
   const isRecording = useSessionStore((s) => s.isRecording);
+  const groqApiKey = useSettingsStore((s) => s.groqApiKey);
 
   const processQueue = useCallback(async (): Promise<void> => {
     if (processingRef.current) return;
@@ -32,6 +34,7 @@ export function useAudioCapture(): UseAudioCaptureReturn {
       const file = new File([blob], 'chunk.webm', { type: 'audio/webm' });
       const formData = new FormData();
       formData.append('audio', file);
+      formData.append('apiKey', groqApiKey);
 
       const attemptTranscribe = async (): Promise<string | null> => {
         try {
@@ -60,7 +63,7 @@ export function useAudioCapture(): UseAudioCaptureReturn {
     }
 
     processingRef.current = false;
-  }, [appendTranscriptChunk]);
+  }, [appendTranscriptChunk, groqApiKey]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     setPermissionError(null);

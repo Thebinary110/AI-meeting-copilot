@@ -46,6 +46,7 @@ export interface SessionExport {
 }
 
 export interface Settings {
+  groqApiKey: string;
   suggestionPrompt: string;
   chatPrompt: string;
   suggestionContextWords: number;

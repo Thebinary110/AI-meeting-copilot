@@ -29,6 +29,8 @@ interface SettingsModalProps {
 export default function SettingsModal({ onClose }: SettingsModalProps): JSX.Element {
   const store = useSettingsStore();
 
+  const [groqApiKey, setGroqApiKey] = useState(store.groqApiKey);
+  const [showKey, setShowKey] = useState(false);
   const [suggestionPrompt, setSuggestionPrompt] = useState(store.suggestionPrompt);
   const [chatPrompt, setChatPrompt] = useState(store.chatPrompt);
   const [suggestionContextWords, setSuggestionContextWords] = useState(
@@ -42,9 +44,8 @@ export default function SettingsModal({ onClose }: SettingsModalProps): JSX.Elem
     store.enabledSuggestionTypes
   );
 
-  const hasApiKey = Boolean(process.env.NEXT_PUBLIC_GROQ_API_KEY);
-
   useEffect(() => {
+    setGroqApiKey(store.groqApiKey);
     setSuggestionPrompt(store.suggestionPrompt);
     setChatPrompt(store.chatPrompt);
     setSuggestionContextWords(store.suggestionContextWords);
@@ -54,6 +55,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps): JSX.Elem
   }, [store]);
 
   const handleSave = (): void => {
+    store.updateSetting('groqApiKey', groqApiKey.trim());
     store.updateSetting('suggestionPrompt', suggestionPrompt);
     store.updateSetting('chatPrompt', chatPrompt);
     store.updateSetting('suggestionContextWords', suggestionContextWords);
@@ -91,18 +93,41 @@ export default function SettingsModal({ onClose }: SettingsModalProps): JSX.Elem
 
         <div className="px-6 py-4 space-y-6">
           <section>
-            <h3 className="text-sm font-medium text-zinc-300 mb-2">API Configuration</h3>
-            <div className="flex items-center gap-2 p-3 bg-zinc-800 rounded-lg">
-              <span className="text-xs text-zinc-400">
-                API key loaded from .env.local (NEXT_PUBLIC_GROQ_API_KEY)
-              </span>
-              {hasApiKey ? (
-                <span className="text-emerald-400 text-sm ml-auto">✓</span>
-              ) : (
-                <span className="text-red-400 text-xs ml-auto">
-                  Missing — set NEXT_PUBLIC_GROQ_API_KEY in .env.local
-                </span>
-              )}
+            <h3 className="text-sm font-medium text-zinc-300 mb-2">Groq API Key</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type={showKey ? 'text' : 'password'}
+                  value={groqApiKey}
+                  onChange={(e) => setGroqApiKey(e.target.value)}
+                  placeholder="gsk_..."
+                  className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 outline-none focus:border-zinc-500 font-mono placeholder-zinc-600"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey((v) => !v)}
+                  className="px-3 py-2 text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition-colors flex-shrink-0"
+                >
+                  {showKey ? 'Hide' : 'Show'}
+                </button>
+                {groqApiKey.trim() ? (
+                  <span className="text-emerald-400 text-lg flex-shrink-0">✓</span>
+                ) : (
+                  <span className="text-red-400 text-lg flex-shrink-0">✗</span>
+                )}
+              </div>
+              <p className="text-xs text-zinc-500">
+                Get your free key at{' '}
+                <a
+                  href="https://console.groq.com/keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  console.groq.com/keys
+                </a>
+                . Stored locally in your browser — never sent anywhere except Groq.
+              </p>
             </div>
           </section>
 

@@ -8,6 +8,7 @@ interface SuggestionRaw {
 }
 
 interface RequestBody {
+  apiKey: string;
   transcriptWindow: string;
   previousSuggestions: string[];
   prompt: string;
@@ -25,9 +26,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const body: RequestBody = await req.json() as RequestBody;
     const { transcriptWindow, previousSuggestions, prompt } = body;
 
-    const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const apiKey = body.apiKey?.trim()
+      || process.env.NEXT_PUBLIC_GROQ_API_KEY
+      || '';
+
     if (!apiKey) {
-      return NextResponse.json({ error: 'NEXT_PUBLIC_GROQ_API_KEY is not set' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'No Groq API key provided. Please add your key in Settings.' },
+        { status: 401 }
+      );
     }
 
     const groq = new Groq({ apiKey });

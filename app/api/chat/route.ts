@@ -7,9 +7,23 @@ interface ChatRequestMessage {
 }
 
 interface RequestBody {
+  apiKey: string;
   messages: ChatRequestMessage[];
   fullTranscript: string;
   prompt: string;
+}
+
+function errorStream(message: string): Response {
+  const readable = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(`data: ${message}\n\n`));
+      controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+      controller.close();
+    },
+  });
+  return new Response(readable, {
+    headers: { 'Content-Type': 'text/event-stream' },
+  });
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -17,18 +31,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     const body: RequestBody = await req.json() as RequestBody;
     const { messages, fullTranscript, prompt } = body;
 
-    const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const apiKey = body.apiKey?.trim()
+      || process.env.NEXT_PUBLIC_GROQ_API_KEY
+      || '';
+
     if (!apiKey) {
-      const errorStream = new ReadableStream({
-        start(controller) {
-          controller.enqueue(new TextEncoder().encode('data: NEXT_PUBLIC_GROQ_API_KEY is not set\n\n'));
-          controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
-          controller.close();
-        },
-      });
-      return new Response(errorStream, {
-        headers: { 'Content-Type': 'text/event-stream' },
-      });
+      return errorStream('No Groq API key provided. Please add your key in Settings.');
     }
 
     const groq = new Groq({ apiKey });
@@ -74,15 +82,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Chat failed';
-    const errorStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(new TextEncoder().encode(`data: Error: ${message}\n\n`));
-        controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
-        controller.close();
-      },
-    });
-    return new Response(errorStream, {
-      headers: { 'Content-Type': 'text/event-stream' },
-    });
+    return errorStream(`Error: ${message}`);
   }
 }

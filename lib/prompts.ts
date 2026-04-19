@@ -42,6 +42,7 @@ Full meeting transcript so far:
 
 Answer the user's question with depth and precision. Structure your answer clearly — use bullet points for multi-part answers. Ground your answer in what was actually discussed in the meeting where relevant. Be concise but complete. Do not pad the response.`;
 
+export const DEFAULT_GROQ_API_KEY = '';
 export const DEFAULT_SUGGESTION_CONTEXT_WORDS = 600;
 export const DEFAULT_CHAT_CONTEXT_WORDS = 6000;
 export const DEFAULT_REFRESH_INTERVAL_MS = 30000;

@@ -56,6 +56,7 @@ export function useSuggestionLoop(): UseSuggestionLoopReturn {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            apiKey: settings.groqApiKey,
             transcriptWindow,
             previousSuggestions,
             prompt: settings.suggestionPrompt,
